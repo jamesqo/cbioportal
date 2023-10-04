@@ -20,17 +20,7 @@ public class JdbcDataSource extends BasicDataSource {
         String database = dbProperties.getDbName();
         String enablePooling = (!StringUtils.isBlank(dbProperties.getDbEnablePooling())) ? dbProperties.getDbEnablePooling(): "false";
         String connectionURL = dbProperties.getConnectionURL();
-        
-        Assert.isTrue(
-            !defined(host) && !defined(database) && !defined(dbProperties.getDbUseSSL()),
-            "\n----------------------------------------------------------------------------------------------------------------" +
-                "-- Connection error:\n" +
-                "-- You try to connect to the database using the deprecated 'db.host', 'db.portal_db_name' and 'db.use_ssl' properties.\n" +
-                "-- Please remove these properties and use the 'db.connection_string' property instead. See https://docs.cbioportal.org/deployment/customization/portal.properties-reference/\n" +
-                "-- for assistance on building a valid connection string.\n" +
-                "----------------------------------------------------------------------------------------------------------------\n"
-        );
-        
+
         Assert.hasText(userName, errorMessage("username", "db.user"));
         Assert.hasText(password, errorMessage("password", "db.password"));
         Assert.hasText(mysqlDriverClassName, errorMessage("driver class name", "db.driver"));
