@@ -1,6 +1,5 @@
 package org.cbioportal.service.impl;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.cbioportal.model.*;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.persistence.ClinicalDataRepository;
@@ -15,14 +14,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -392,12 +388,12 @@ public class ClinicalDataServiceImplTest extends BaseServiceImplTest {
         when(clinicalDataRepository.getPatientClinicalDataBySampleInternalIds(sampleInternalIds)).thenReturn(
             List.of(datum1, datum2)
         );
-
-        ImmutablePair<SampleClinicalDataCollection, Integer> result = clinicalDataService.fetchSampleClinicalTable(
+        
+        ClinicalDataTableResult result = clinicalDataService.fetchSampleClinicalTable(
             sampleStudyIds, sampleIds, pageSize, pageNumber, searchTerm, sortBy, direction
         );
-        SampleClinicalDataCollection clinicalDataCollection = result.getLeft();
-        Integer itemCount = result.getRight();
+        SampleClinicalDataCollection clinicalDataCollection = result.getSampleClinicalDataCollection();
+        Integer itemCount = result.getTotalCount();
 
         Assert.assertEquals(4, (int) itemCount);
         Assert.assertEquals(2, clinicalDataCollection.getByUniqueSampleKey().size());
@@ -415,16 +411,16 @@ public class ClinicalDataServiceImplTest extends BaseServiceImplTest {
     public void fetchSampleClinicalTableEmptyIdLists() {
         Assert.assertEquals(0, clinicalDataService.fetchSampleClinicalTable(
             null, sampleIds, pageSize, pageNumber, searchTerm, sortBy, direction
-        ).getLeft().getByUniqueSampleKey().size());
+        ).getSampleClinicalDataCollection().getByUniqueSampleKey().size());
         Assert.assertEquals(0, clinicalDataService.fetchSampleClinicalTable(
             sampleStudyIds, null, pageSize, pageNumber, searchTerm, sortBy, direction
-        ).getLeft().getByUniqueSampleKey().size());
+        ).getSampleClinicalDataCollection().getByUniqueSampleKey().size());
         Assert.assertEquals(0, clinicalDataService.fetchSampleClinicalTable(
             new ArrayList<>(), sampleIds, pageSize, pageNumber, searchTerm, sortBy, direction
-        ).getLeft().getByUniqueSampleKey().size());
+        ).getSampleClinicalDataCollection().getByUniqueSampleKey().size());
         Assert.assertEquals(0, clinicalDataService.fetchSampleClinicalTable(
             sampleStudyIds, new ArrayList<>(), pageSize, pageNumber, searchTerm, sortBy, direction
-        ).getLeft().getByUniqueSampleKey().size());
+        ).getSampleClinicalDataCollection().getByUniqueSampleKey().size());
     }
 
 }

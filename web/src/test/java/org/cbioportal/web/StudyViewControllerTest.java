@@ -1,7 +1,6 @@
 package org.cbioportal.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.cbioportal.model.*;
 import org.cbioportal.model.util.Select;
 import org.cbioportal.persistence.AlterationRepository;
@@ -887,7 +886,7 @@ public class StudyViewControllerTest {
         // For this sake of this test the sample clinical data and patient clinical data are identical.
         when(clinicalDataService.fetchSampleClinicalTable(anyList(), anyList(),
             anyInt(), anyInt(), anyString(), any(), anyString())).thenReturn(
-                new ImmutablePair<>(tableClinicalData, 100)
+                new ClinicalDataTableResult(tableClinicalData, 100)
             );
 
         StudyViewFilter studyViewFilter = new StudyViewFilter();

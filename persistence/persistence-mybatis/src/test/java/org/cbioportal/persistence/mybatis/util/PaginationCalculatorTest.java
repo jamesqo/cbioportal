@@ -46,4 +46,5 @@ public class PaginationCalculatorTest {
         Assert.assertEquals(6, (int) paginationCalculator.lastIndex(3, 3, 26));
         Assert.assertEquals(26, (int) paginationCalculator.lastIndex(25, 3, 26));
     }
+    
 }

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiParam;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.commons.math3.util.Pair;
@@ -17,7 +16,6 @@ import org.cbioportal.service.util.ClinicalAttributeUtil;
 import org.cbioportal.web.config.annotation.InternalApi;
 import org.cbioportal.model.AlterationFilter;
 import org.cbioportal.web.parameter.*;
-import org.cbioportal.web.parameter.sort.ClinicalDataSortBy;
 import org.cbioportal.web.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -991,13 +989,13 @@ public class StudyViewController {
     ) {
 
         boolean singleStudyUnfiltered = studyViewFilterUtil.isSingleStudyUnfiltered(interceptedStudyViewFilter);
-        ImmutablePair<SampleClinicalDataCollection, Integer> sampleClinicalData = cachedClinicalDataTableData(
+        ClinicalDataTableResult sampleClinicalData = cachedClinicalDataTableData(
             interceptedStudyViewFilter, singleStudyUnfiltered, pageNumber, pageSize, sortBy, searchTerm, direction.name()
         );
 
         // Because of pagination, the total number of sample matches can be larger than the items in the requested page.
-        SampleClinicalDataCollection aggregatedClinicalDataByUniqueSampleKey = sampleClinicalData.getLeft();
-        Integer totalNumberOfResults = sampleClinicalData.getRight();
+        SampleClinicalDataCollection aggregatedClinicalDataByUniqueSampleKey = sampleClinicalData.getSampleClinicalDataCollection();
+        Integer totalNumberOfResults = sampleClinicalData.getTotalCount();
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HeaderKeyConstants.TOTAL_COUNT, String.valueOf(totalNumberOfResults));
@@ -1012,7 +1010,7 @@ public class StudyViewController {
         cacheResolver = "staticRepositoryCacheOneResolver",
         condition = "@cacheEnabledConfig.getEnabled() && #singleStudyUnfiltered && (#sortBy == null || #sortBy.isEmpty()) && (#searchTerm == null || #searchTerm.isEmpty()) && #pageNumber == 0"
     )
-    public ImmutablePair<SampleClinicalDataCollection, Integer> cachedClinicalDataTableData(
+    public ClinicalDataTableResult cachedClinicalDataTableData(
         StudyViewFilter interceptedStudyViewFilter, boolean singleStudyUnfiltered, Integer pageNumber, 
         Integer pageSize, String sortBy, String searchTerm, String sortDirection
     ) {

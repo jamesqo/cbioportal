@@ -1,6 +1,5 @@
 package org.cbioportal.service.impl;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.cbioportal.model.*;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.persistence.ClinicalDataRepository;
@@ -234,11 +233,11 @@ public class ClinicalDataServiceImpl implements ClinicalDataService {
     }
 
     @Override
-    public ImmutablePair<SampleClinicalDataCollection, Integer> fetchSampleClinicalTable(List<String> studyIds, List<String> sampleIds, Integer pageSize, Integer pageNumber, String searchTerm, String sortBy, String direction) {
+    public ClinicalDataTableResult fetchSampleClinicalTable(List<String> studyIds, List<String> sampleIds, Integer pageSize, Integer pageNumber, String searchTerm, String sortBy, String direction) {
 
         SampleClinicalDataCollection sampleClinicalDataCollection = new SampleClinicalDataCollection();
         if (studyIds == null || studyIds.isEmpty() || sampleIds == null || sampleIds.isEmpty()) {
-            return new ImmutablePair<>(sampleClinicalDataCollection, 0);
+            return new ClinicalDataTableResult();
         }
         
         // Request un-paginated data.
@@ -250,7 +249,7 @@ public class ClinicalDataServiceImpl implements ClinicalDataService {
         Integer offset = paginationCalculator.offset(pageSize, pageNumber);
 
         if (allSampleInternalIds.isEmpty() || offset >= allSampleInternalIds.size()) {
-            return new ImmutablePair<>(sampleClinicalDataCollection, 0);
+            return new ClinicalDataTableResult();
         }
 
         // Apply pagination to the sampleId list.
@@ -271,7 +270,7 @@ public class ClinicalDataServiceImpl implements ClinicalDataService {
                     calculateBase64(clinicalDatum.getSampleId(), clinicalDatum.getStudyId())
         )));
         
-        return new ImmutablePair<>(sampleClinicalDataCollection, allSampleInternalIds.size());
+        return new ClinicalDataTableResult(sampleClinicalDataCollection, allSampleInternalIds.size());
     }
 
 }
