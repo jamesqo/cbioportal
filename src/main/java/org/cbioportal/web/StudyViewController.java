@@ -54,6 +54,7 @@ import org.cbioportal.web.parameter.ClinicalDataBinFilter;
 import org.cbioportal.web.parameter.ClinicalDataCountFilter;
 import org.cbioportal.web.parameter.ClinicalDataFilter;
 import org.cbioportal.web.parameter.DataBinMethod;
+import org.cbioportal.web.parameter.DataFilterValue;
 import org.cbioportal.web.parameter.Direction;
 import org.cbioportal.web.parameter.GenericAssayDataBinCountFilter;
 import org.cbioportal.web.parameter.GenericAssayDataCountFilter;
@@ -160,6 +161,11 @@ public class StudyViewController {
 
         List<ClinicalDataFilter> attributes = interceptedClinicalDataCountFilter.getAttributes();
         StudyViewFilter studyViewFilter = interceptedClinicalDataCountFilter.getStudyViewFilter();
+        List<String> studyIds = studyViewFilter.getStudyIds();
+
+        if (studyIds != null && studyIds.size() == 1 && studyIds.get(0).equals("enclave_2024")) {
+            return fetchEnclaveClinicalDataCounts(attributes, studyViewFilter);
+        }
         
         if (attributes.size() == 1) {
             studyViewFilterUtil.removeSelfFromFilter(attributes.get(0).getAttributeId(), studyViewFilter);
@@ -170,6 +176,31 @@ public class StudyViewController {
                                                         unfilteredQuery);
         return new ResponseEntity<>(result, HttpStatus.OK);
                         
+    }
+
+    private ResponseEntity<List<ClinicalDataCountItem>> fetchEnclaveClinicalDataCounts(
+        List<ClinicalDataFilter> attributes,
+        StudyViewFilter studyViewFilter
+    ) {
+        List<ClinicalDataFilter> cohortFilters = studyViewFilter.getClinicalDataFilters();
+        List<String> cohortFilterParams = new ArrayList<>();
+        for (ClinicalDataFilter filter : cohortFilters) {
+            for (DataFilterValue valueObj : filter.getValues()) {
+                String key = filter.getAttributeId();
+                String value = valueObj.getValue();
+                cohortFilterParams.add(f"{encodeURIComponent(key)}={encodeURIComponent(value)}");
+            }
+        }
+
+        List<ClinicalDataCountItem> result = new ArrayList<>();
+
+        for (ClinicalDataFilter attribute : attributes) {
+            String attributeId = attribute.getAttributeId();
+            List<String> uniqueValues = ...;
+            for (String value : uniqueValues) {
+                String attributeFilterParam = 
+            }
+        }
     }
 
     @Cacheable(
